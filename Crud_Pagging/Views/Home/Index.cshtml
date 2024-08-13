@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+    <html>
+    <head>
+        <title></title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    </head>
+    <body>
+    @if (TempData["InsertedMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <strong> Success! </strong> @TempData["InsertedMessage"];
+        </div>
+    }
+    
+    @if (TempData["UpdatedMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <strong> Success! </strong> @TempData["UpdatedMessage"];
+        </div>
+    }
+    <a class="btn btn-success" href="/Home/Create">Create</a>
+<table class="table table-striped display" id="myTable">
+    <thead>
+        <tr>
+            <th scope="col">Stu_Id</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Age</th>
+            <th scope="col">Gender</th>
+                <th scope="col">Actions</th>
+        </tr>
+    </thead> 
+</table>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+@* <script src="~/js/view.js" asp-append-version="true"></script>  *@
+</body>
+</html>
+    <script>
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            "serverSide": true,
+            "processing": true,
+            "filtering" : true,
+            "paging": true,
+            "ajax": {
+                "url": "/Home/Indexx",
+                "type": "POST",
+                "dataType": "json",
+                "data": function (d) {
+                    d.start = d.start || 0;
+                    d.length = d.length || 10;
+                    d.search.value = d.search.value || '';
+                    d.order[0].column = d.order[0].column || 0;
+                    d.order[0].dir = d.order[0].dir || 'asc';
+                },
+                "dataSrc": function (json) {
+                    console.log('Data received:', json);
+                    return json.data;
+                },
+                "error": function (xhr, status, error) {
+                    console.error('Error status:', status);
+                    console.error('Error message:', error);
+                    console.error('Response:', xhr.responseText);
+                }
+            },
+            "columns": [
+                { "data": "stu_Id", "name": "Stu_Id", "autoWidth": true },
+                { "data": "firstName", "name": "FirstName", "autoWidth": true },
+                { "data": "lastName", "name": "LastName", "autoWidth": true },
+                { "data": "age", "name": "Age", "autoWidth": true },
+                { "data": "gender", "name": "Gender", "autoWidth": true },
+               
+                {
+                    "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="/Home/Edit/?id=' + full.stu_Id + '">Edit</a>'; }
+                },
+                {
+                    "render": function (data, type, full, meta) {
+                        return '<a class="btn btn-danger" href="/Home/Delete/?id=' + full.stu_Id + '">Delete</a>';
+                    }
+                }
+
+
+            ]
+        });
+    });
+
+    </script>
